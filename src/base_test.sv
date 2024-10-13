@@ -6,7 +6,7 @@ class base_test extends uvm_test;
   
   env  				e0;
   gen_item_seq 		seq;
-  virtual  	interface 	vif;
+  virtual  	vir_interface 	vif;
   
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
@@ -16,9 +16,9 @@ class base_test extends uvm_test;
     
     // Get virtual IF handle from top level and pass it to everything
     // in env level
-    if (!uvm_config_db#(virtual interface)::get(this, "", "interface", vif))
+    if (!uvm_config_db#(virtual vir_interface)::get(this, "", "vir_interface", vif))
       `uvm_fatal("TEST", "Did not get vif")      
-    uvm_config_db#(virtual interface)::set(this, "e0.a0.*", "interface", vif);
+    uvm_config_db#(virtual vir_interface)::set(this, "e0.a0.*", "vir_interface", vif);
     
     // Create sequence and randomize it
     seq = gen_item_seq::type_id::create("seq");

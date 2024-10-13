@@ -5,11 +5,11 @@ class monitor extends uvm_monitor;
    endfunction
 
    uvm_analysis_port #(item)  mon_ap;
-   virtual interface          vif;
+   virtual vir_interface          vif;
 
   virtual function void build_phase (uvm_phase phase);
   super.build_phase(phase);
-  if (!uvm_config_db #(virtual interface)::get(this, "", "interface", vif))
+  if (!uvm_config_db #(virtual vir_interface)::get(this, "", "vir_interface", vif))
       `uvm_fatal("MON", "Could not get vif")
     mon_ap = new ("mon_ap", this); // create analysis port
   endfunction
