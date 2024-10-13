@@ -43,7 +43,6 @@ module tb;
     .clk(clk),
     .rst(rst),
 
-    
     // AXI slave interface
     .s_axi_awid(axi_if.s_axi_awid),
     .s_axi_awaddr(axi_if.s_axi_awaddr),
