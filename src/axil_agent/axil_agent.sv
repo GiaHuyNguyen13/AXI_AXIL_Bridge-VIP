@@ -1,16 +1,16 @@
-class agent extends uvm_agent;
-  `uvm_component_utils(agent)
-  function new(string name="agent", uvm_component parent=null);
+class axil_agent extends uvm_agent;
+  `uvm_component_utils(axil_agent)
+  function new(string name="axil_agent", uvm_component parent=null);
     super.new(name, parent);
   endfunction
   
-  driver 		d0; 		// Driver handle
-  monitor 		m0; 		// Monitor handle
-  uvm_sequencer #(item)	s0; 		// Sequencer Handle
+  axil_driver 		d0; 		// Driver handle
+  axil_monitor 		m0; 		// Monitor handle
+  uvm_sequencer #(axil_item)	s0; 		// Sequencer Handle
 
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    s0 = uvm_sequencer#(item)::type_id::create("s0", this);
+    s0 = uvm_sequencer#(axil_item)::type_id::create("s0", this);
     d0 = driver::type_id::create("d0", this);
     m0 = monitor::type_id::create("m0", this);
   endfunction
