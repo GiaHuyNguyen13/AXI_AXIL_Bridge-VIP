@@ -14,7 +14,7 @@ class scoreboard extends uvm_scoreboard;
   endfunction
   
   virtual function write(axi_item axi_item);
-  
+    
   endfunction
 
   virtual function write(axil_item axil_item);
