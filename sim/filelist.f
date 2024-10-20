@@ -14,6 +14,9 @@
 // Top tb
 ../src/tb.sv
 
+// Central memory
+../src/central_mem.sv
+
 // AXI Agent
 ../src/axi_agent/axi_item.sv
 ../src/axi_agent/axi_gen_item_seq.sv

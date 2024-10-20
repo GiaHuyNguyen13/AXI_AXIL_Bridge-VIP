@@ -4,15 +4,20 @@ class scoreboard extends uvm_scoreboard;
     super.new(name, parent);
   endfunction
   
-  uvm_analysis_imp #(item, scoreboard) m_analysis_imp;
+  uvm_analysis_imp #(axi_item, scoreboard) axi_analysis_imp;
+  uvm_analysis_imp #(axil_item, scoreboard) axil_analysis_imp;
     
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-
-    m_analysis_imp = new("m_analysis_imp", this);
+    axi_analysis_imp = new("axi_analysis_imp", this);
+    axil_analysis_imp = new("axil_analysis_imp", this);
   endfunction
   
-  virtual function write(item item);
+  virtual function write(axi_item axi_item);
+    
+  endfunction
+
+  virtual function write(axil_item axil_item);
   
   endfunction
 endclass
