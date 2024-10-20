@@ -4,7 +4,7 @@ class axil_item extends uvm_sequence_item;
       super.new (name, parent);
    endfunction
 
-   rand bit         operation; // 0 for read, 1 for write
+   // rand bit         operation; // 0 for read, 1 for write
 
    // Write address line
         bit [31:0]  m_axil_awaddr;
