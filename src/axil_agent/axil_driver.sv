@@ -5,11 +5,14 @@ class axil_driver extends uvm_driver #(axil_item);
   endfunction
   
   virtual axil_interface axil_vif;
+  centralized_memory_model mem;
   
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     if (!uvm_config_db#(virtual axil_interface)::get(this, "", "axil_interface", axil_vif))
       `uvm_fatal("DRV", "Could not get axil_vif")
+    if (!uvm_config_db#(centralized_memory_model)::get(this, "", "central_memory", mem)) begin
+      `uvm_fatal("CONFIG_ERR", "Could not get centralized memory from config DB.");
   endfunction
   
   virtual task run_phase(uvm_phase phase);
@@ -36,7 +39,7 @@ class axil_driver extends uvm_driver #(axil_item);
   virtual task resp_r_data (axil_item m_item);
       if (!m_item.operation) begin // Read operation
           @(negedge axil_vif.m_axil_arready);
-          axil_vif.m_axil_rdata  <= m_item.m_axil_rdata;
+          axil_vif.m_axil_rdata  <= mem.read(axil_vif.m_axil_araddr);
           axil_vif.m_axil_rresp  <= m_item.m_axil_rresp;
           axil_vif.m_axil_rvalid <= m_item.m_axil_rvalid;
           @(negedge axil_vif.m_axil_rready);
