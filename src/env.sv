@@ -1,3 +1,4 @@
+// `include "central_mem.sv"
 class env extends uvm_env;
   `uvm_component_utils(env)
   function new(string name="env", uvm_component parent=null);
@@ -14,7 +15,7 @@ class env extends uvm_env;
     axi_a0 = axi_agent::type_id::create("axi_a0", this);
     axil_a0 = axil_agent::type_id::create("axil_a0", this);
     sb0 = scoreboard::type_id::create("sb0", this);
-    mem = centralized_memory_model::new();
+    mem = new();
     uvm_config_db#(centralized_memory_model)::set(this, "*", "central_memory", mem);
   endfunction
   

@@ -19,6 +19,7 @@ class axi_driver extends uvm_driver #(axi_item);
       `uvm_info("DRV", $sformatf("Wait for item from sequencer"), UVM_HIGH)
       seq_item_port.get_next_item(m_item); // get next item
       drive_item(m_item); // forward item to DUT through interface
+      `uvm_info("DRV", $sformatf("AXI item done"), UVM_HIGH)
       seq_item_port.item_done(); // item get done
     end
   endtask

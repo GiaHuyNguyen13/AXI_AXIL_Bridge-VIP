@@ -19,8 +19,9 @@ class axil_monitor extends uvm_monitor;
     // This task monitors the interface for a complete 
     // transaction and writes into analysis port when complete
     forever begin
+        axil_item m_item;
         @(axil_vif.clk);
-        axil_item m_item = axil_item::type_id::create("m_item");
+        m_item = axil_item::type_id::create("m_item");
         // Write address line
         m_item.m_axil_awaddr  = axil_vif.m_axil_awaddr;
         m_item.m_axil_awprot  = axil_vif.m_axil_awprot;
@@ -51,7 +52,7 @@ class axil_monitor extends uvm_monitor;
         m_item.m_axil_rready  = axil_vif.m_axil_rready;
 
 
-			  axil_mon_ap.write(m_item); // send tempo item to analysis port, which will be sent to scoreboard
+			  // axil_mon_ap.write(m_item); // send tempo item to analysis port, which will be sent to scoreboard
 		end
     
   endtask

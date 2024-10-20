@@ -1,9 +1,9 @@
-`include "uvm_macros.svh"
-
+// `include "uvm_macros.svh"
+`include "uvm.sv"
 import uvm_pkg::*;
 
 module tb;
-  reg clk, rst;
+  logic clk, rst;
 
 // Clock gen
   initial begin

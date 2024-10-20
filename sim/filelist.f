@@ -1,6 +1,9 @@
 
 // Import UVM classes
 +incdir+../../uvm-1.2/src
+../../uvm-1.2/src/uvm_pkg.sv
+
++incldir+../src
 
 // Design
 ../src/axi_axil_adapter.v

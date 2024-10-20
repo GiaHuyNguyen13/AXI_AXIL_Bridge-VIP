@@ -20,6 +20,7 @@ class axi_monitor extends uvm_monitor;
     // transaction and writes into analysis port when complete
     forever begin
         // @(axi_vif.clk);
+        axi_item m_item_beat;
         axi_item m_item = axi_item::type_id::create("m_item");
         wait ((axi_vif.s_axi_awvalid && axi_vif.s_axi_awready) || (axi_vif.s_axi_arvalid && axi_vif.s_axi_arready));
 
@@ -38,7 +39,7 @@ class axi_monitor extends uvm_monitor;
 
             for (int i = 0; i <= axi_vif.s_axi_awlen; i++) begin
               wait (axi_vif.s_axi_wvalid && axi_vif.s_axi_wready);
-              axi_item m_item_beat = axi_item::type_id::create("m_item_beat");
+              m_item_beat = axi_item::type_id::create("m_item_beat");
               m_item_beat.s_axi_awid    = m_item.s_axi_awid;
               m_item_beat.s_axi_awaddr  = m_item.s_axi_awaddr;
               m_item_beat.s_axi_awlen   = m_item.s_axi_awlen;
@@ -82,7 +83,7 @@ class axi_monitor extends uvm_monitor;
 
             for (int i = 0; i <= axi_vif.s_axi_arlen; i++) begin
               wait (axi_vif.s_axi_rvalid && axi_vif.s_axi_rready);
-              axi_item m_item_beat = axi_item::type_id::create("m_item_beat");
+              m_item_beat = axi_item::type_id::create("m_item_beat");
               // Read address line
               m_item_beat.s_axi_arid    = m_item.s_axi_arid;
               m_item_beat.s_axi_araddr  = m_item.s_axi_araddr;

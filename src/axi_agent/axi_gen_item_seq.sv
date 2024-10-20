@@ -10,7 +10,7 @@ class axi_gen_item_seq extends uvm_sequence;
     for (int i = 0; i < num; i ++) begin
     	axi_item m_item = axi_item::type_id::create("m_item");
     	start_item(m_item);
-    	m_item.randomize()
+    	m_item.randomize();
       finish_item(m_item);
     end
     `uvm_info("SEQ", $sformatf("Done generation of %0d items", num), UVM_LOW)

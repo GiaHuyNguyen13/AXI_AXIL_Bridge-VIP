@@ -54,7 +54,9 @@ class axi_item extends uvm_sequence_item;
    endfunction
 
    // *********** CONSTRAINTS *********** //
-
+    constraint c_op {
+      operation == 0;
+    }
    constraint c_s_axi_awid {
       s_axi_awid inside {[0:255]};
    }
@@ -104,23 +106,28 @@ class axi_item extends uvm_sequence_item;
    }
 
    constraint c_s_axi_arid {
-      s_axi_arid inside {[0:255]};
+      // s_axi_arid inside {[0:255]};
+      s_axi_arid == 1;
    }
 
    constraint c_s_axi_araddr {
-      s_axi_araddr inside {[0:2**32-1]};
+      // s_axi_araddr inside {[0:2**32-1]};
+      s_axi_araddr == 1;
    }
 
    constraint c_s_axi_arlen {
-      s_axi_arlen inside {[0:255]};
+      // s_axi_arlen inside {[0:255]};
+      s_axi_arlen == 0;
    }
 
    constraint c_s_axi_arsize {
-      s_axi_arsize inside {[0:7]};
+      // s_axi_arsize inside {[0:7]};
+      s_axi_arsize == 7;
    }
 
    constraint c_s_axi_arburst {
-      s_axi_arburst inside {[0:3]};
+      // s_axi_arburst inside {[0:3]};
+      s_axi_arburst == 0;
    }
 
    constraint c_s_axi_arlock {

@@ -1,10 +1,10 @@
 class axil_item extends uvm_sequence_item;
     `uvm_object_utils(axil_item)
-   function new (string name="axil_item", uvm_component parent);
-      super.new (name, parent);
+   function new (string name="axil_item");
+      super.new (name);
    endfunction
 
-   // rand bit         operation; // 0 for read, 1 for write
+   rand bit         operation; // 0 for read, 1 for write
 
    // Write address line
         bit [31:0]  m_axil_awaddr;

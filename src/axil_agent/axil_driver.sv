@@ -9,9 +9,9 @@ class axil_driver extends uvm_driver #(axil_item);
   
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
-    if (!uvm_config_db#(virtual axil_interface)::get(this, "", "axil_interface", axil_vif))
-      `uvm_fatal("DRV", "Could not get axil_vif")
-    if (!uvm_config_db#(centralized_memory_model)::get(this, "", "central_memory", mem)) begin
+    if (!uvm_config_db#(virtual axil_interface)::get(this, "*", "axil_interface", axil_vif))
+      `uvm_fatal("DRV", "Could not get axil_vif");
+    if (!uvm_config_db#(centralized_memory_model)::get(this, "*", "central_memory", mem))
       `uvm_fatal("CONFIG_ERR", "Could not get centralized memory from config DB.");
   endfunction
   
@@ -21,7 +21,7 @@ class axil_driver extends uvm_driver #(axil_item);
       axil_item m_item;
       `uvm_info("DRV", $sformatf("Wait for item from sequencer"), UVM_HIGH)
       seq_item_port.get_next_item(m_item); // get next item
-      drive_item(m_item); // forward item to DUT through interface
+      response_item(m_item); // forward item to DUT through interface
       seq_item_port.item_done(); // item get done
     end
   endtask

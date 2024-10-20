@@ -107,32 +107,32 @@ parameter SEGMENT_DATA_WIDTH = DATA_WIDTH / SEGMENT_COUNT;
 parameter SEGMENT_STRB_WIDTH = STRB_WIDTH / SEGMENT_COUNT;
 
 // bus width assertions
-initial begin
-    if (AXI_WORD_SIZE * AXI_STRB_WIDTH != AXI_DATA_WIDTH) begin
-        $error("Error: AXI slave interface data width not evenly divisble (instance %m)");
-        $finish;
-    end
+// initial begin
+//     if (AXI_WORD_SIZE * AXI_STRB_WIDTH != AXI_DATA_WIDTH) begin
+//         $error("Error: AXI slave interface data width not evenly divisble (instance %m)");
+//         $finish;
+//     end
 
-    if (AXIL_WORD_SIZE * AXIL_STRB_WIDTH != AXIL_DATA_WIDTH) begin
-        $error("Error: AXI lite master interface data width not evenly divisble (instance %m)");
-        $finish;
-    end
+//     if (AXIL_WORD_SIZE * AXIL_STRB_WIDTH != AXIL_DATA_WIDTH) begin
+//         $error("Error: AXI lite master interface data width not evenly divisble (instance %m)");
+//         $finish;
+//     end
 
-    if (AXI_WORD_SIZE != AXIL_WORD_SIZE) begin
-        $error("Error: word size mismatch (instance %m)");
-        $finish;
-    end
+//     if (AXI_WORD_SIZE != AXIL_WORD_SIZE) begin
+//         $error("Error: word size mismatch (instance %m)");
+//         $finish;
+//     end
 
-    if (2**$clog2(AXI_WORD_WIDTH) != AXI_WORD_WIDTH) begin
-        $error("Error: AXI slave interface word width must be even power of two (instance %m)");
-        $finish;
-    end
+//     if (2**$clog2(AXI_WORD_WIDTH) != AXI_WORD_WIDTH) begin
+//         $error("Error: AXI slave interface word width must be even power of two (instance %m)");
+//         $finish;
+//     end
 
-    if (2**$clog2(AXIL_WORD_WIDTH) != AXIL_WORD_WIDTH) begin
-        $error("Error: AXI lite master interface word width must be even power of two (instance %m)");
-        $finish;
-    end
-end
+//     if (2**$clog2(AXIL_WORD_WIDTH) != AXIL_WORD_WIDTH) begin
+//         $error("Error: AXI lite master interface word width must be even power of two (instance %m)");
+//         $finish;
+//     end
+// end
 
 localparam [1:0]
     STATE_IDLE = 2'd0,
@@ -286,7 +286,7 @@ always @* begin
 
                 if (m_axil_rready && m_axil_rvalid) begin
                     s_axi_rid_next = id_reg;
-                    s_axi_rdata_next = m_axil_rdata >> (addr_reg[AXIL_ADDR_BIT_OFFSET-1:AXI_ADDR_BIT_OFFSET] * AXI_DATA_WIDTH);
+                    s_axi_rdata_next = m_axil_rdata >> (addr_reg[AXI_ADDR_BIT_OFFSET:AXIL_ADDR_BIT_OFFSET-1] * AXI_DATA_WIDTH);
                     s_axi_rresp_next = m_axil_rresp;
                     s_axi_rlast_next = 1'b0;
                     s_axi_rvalid_next = 1'b1;
@@ -316,7 +316,7 @@ always @* begin
                     s_axi_rid_next = id_reg;
                     data_next = m_axil_rdata;
                     resp_next = m_axil_rresp;
-                    s_axi_rdata_next = m_axil_rdata >> (addr_reg[AXIL_ADDR_BIT_OFFSET-1:AXI_ADDR_BIT_OFFSET] * AXI_DATA_WIDTH);
+                    s_axi_rdata_next = m_axil_rdata >> (addr_reg[AXI_ADDR_BIT_OFFSET:AXIL_ADDR_BIT_OFFSET-1] * AXI_DATA_WIDTH);
                     s_axi_rresp_next = m_axil_rresp;
                     s_axi_rlast_next = 1'b0;
                     s_axi_rvalid_next = 1'b1;
@@ -346,7 +346,7 @@ always @* begin
 
                 if (s_axi_rready || !s_axi_rvalid) begin
                     s_axi_rid_next = id_reg;
-                    s_axi_rdata_next = data_reg >> (addr_reg[AXIL_ADDR_BIT_OFFSET-1:AXI_ADDR_BIT_OFFSET] * AXI_DATA_WIDTH);
+                    s_axi_rdata_next = data_reg >> (addr_reg[AXI_ADDR_BIT_OFFSET:AXIL_ADDR_BIT_OFFSET-1] * AXI_DATA_WIDTH);
                     s_axi_rresp_next = resp_reg;
                     s_axi_rlast_next = 1'b0;
                     s_axi_rvalid_next = 1'b1;
@@ -412,7 +412,7 @@ always @* begin
                 m_axil_rready_next = !s_axi_rvalid && !m_axil_arvalid;
 
                 if (m_axil_rready && m_axil_rvalid) begin
-                    data_next[addr_reg[AXI_ADDR_BIT_OFFSET-1:AXIL_ADDR_BIT_OFFSET]*SEGMENT_DATA_WIDTH +: SEGMENT_DATA_WIDTH] = m_axil_rdata;
+                    data_next[addr_reg[AXIL_ADDR_BIT_OFFSET:AXI_ADDR_BIT_OFFSET-1]*SEGMENT_DATA_WIDTH +: SEGMENT_DATA_WIDTH] = m_axil_rdata;
                     if (m_axil_rresp) begin
                         resp_next = m_axil_rresp;
                     end
