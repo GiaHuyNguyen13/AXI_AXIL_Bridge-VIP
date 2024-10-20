@@ -31,6 +31,9 @@
 ../src/axil_agent/axil_driver.sv
 ../src/axil_agent/axil_agent.sv
 
+//Reference models
+../src/rd_ref_model.sv
+
 // Remaining UVM components
 ../src/scoreboard.sv
 ../src/env.sv
