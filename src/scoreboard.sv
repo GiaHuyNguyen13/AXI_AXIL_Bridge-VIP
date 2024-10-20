@@ -13,7 +13,11 @@ class scoreboard extends uvm_scoreboard;
     axil_analysis_imp = new("axil_analysis_imp", this);
   endfunction
   
-  virtual function write(item item);
+  virtual function write(axi_item axi_item);
+  
+  endfunction
+
+  virtual function write(axil_item axil_item);
   
   endfunction
 endclass

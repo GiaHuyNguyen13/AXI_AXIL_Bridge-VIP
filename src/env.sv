@@ -18,6 +18,6 @@ class env extends uvm_env;
   virtual function void connect_phase(uvm_phase phase);
     super.connect_phase(phase);
     axi_a0.m0.axi_mon_ap.connect(sb0.axi_analysis_imp);
-    axil_a0.m0.axi_mon_ap.connect(sb0.axil_analysis_imp);
+    axil_a0.m0.axil_mon_ap.connect(sb0.axil_analysis_imp);
   endfunction
 endclass
