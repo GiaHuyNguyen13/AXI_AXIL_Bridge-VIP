@@ -18,6 +18,7 @@ class axi_driver extends uvm_driver #(axi_item);
       axi_item m_item;
       `uvm_info("DRV", $sformatf("Wait for item from sequencer"), UVM_HIGH)
       seq_item_port.get_next_item(m_item); // get next item
+      m_item.print();
       drive_item(m_item); // forward item to DUT through interface
       `uvm_info("DRV", $sformatf("AXI item done"), UVM_HIGH)
       seq_item_port.item_done(); // item get done
@@ -38,6 +39,7 @@ class axi_driver extends uvm_driver #(axi_item);
           axi_vif.s_axi_arprot  <= m_item.s_axi_arprot;
           axi_vif.s_axi_arvalid <= m_item.s_axi_arvalid;
           @(posedge axi_vif.s_axi_arready);
+          `uvm_info("DRV", $sformatf("r_addr"), UVM_HIGH)
           axi_vif.s_axi_arvalid <= 1'b0;
       end
   endtask
@@ -45,8 +47,10 @@ class axi_driver extends uvm_driver #(axi_item);
   virtual task r_data (axi_item m_item);
       @(posedge axi_vif.clk);
       if (!m_item.operation) begin // Read operation
+`uvm_info("DRV", $sformatf("r_data"), UVM_HIGH)
           axi_vif.s_axi_rready <= m_item.s_axi_rready;
           @(negedge axi_vif.s_axi_rlast);
+          `uvm_info("DRV", $sformatf("r_data"), UVM_HIGH)
           axi_vif.s_axi_rready <= 1'b0;
       end
   endtask
@@ -85,10 +89,12 @@ virtual task w_data (axi_item m_item);
 endtask
 
 virtual task drive_item (axi_item m_item);
+  wait(!axi_vif.rst) begin
     r_addr(m_item);
     r_data(m_item);
     w_addr(m_item);
     w_data(m_item);
+  end
 endtask
 
 endclass

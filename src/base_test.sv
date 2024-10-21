@@ -6,6 +6,7 @@ class base_test extends uvm_test;
   
   env  				e0;
   axi_gen_item_seq 		axi_seq;
+  axil_gen_item_seq    axil_seq;
   virtual  	axi_interface 	axi_vif;
   virtual   axil_interface  axil_vif;
   
@@ -28,12 +29,17 @@ class base_test extends uvm_test;
     // Create sequence and randomize it
     axi_seq = axi_gen_item_seq::type_id::create("axi_seq");
     axi_seq.randomize();
+    axil_seq = axil_gen_item_seq::type_id::create("axil_seq");
+    axil_seq.randomize();
   endfunction
   
   virtual task run_phase(uvm_phase phase);
     phase.raise_objection(this);
     // apply_reset();
+    fork
     axi_seq.start(e0.axi_a0.s0);
+    axil_seq.start(e0.axil_a0.s1);
+    join
     #200;
     phase.drop_objection(this);
   endtask

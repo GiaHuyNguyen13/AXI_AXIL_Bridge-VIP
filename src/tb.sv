@@ -7,14 +7,25 @@ module tb;
 
 // Clock gen
   initial begin
-    clk <= 0;
+    clk = 0;
     forever #10 clk = ~clk; 
   end
 
 // Reset gen
   initial begin
-    rst <= 1'b1;
-    #10 rst <= 1'b0;
+    rst = 1'b1;
+    #100 rst = 1'b0;
+  end
+
+  // Reset gen
+  initial begin
+    repeat (10000) @(posedge clk);
+    $finish;
+  end
+
+  initial begin
+  $dumpfile("waveform.vcd");  // Specify the dump file name
+  $dumpvars(0, tb); // Dump all signals in the design hierarchy under <top_module>
   end
 
 // Interface connect

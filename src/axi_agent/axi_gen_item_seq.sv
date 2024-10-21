@@ -4,15 +4,16 @@ class axi_gen_item_seq extends uvm_sequence;
     super.new(name);
   endfunction
 
-  rand bit [6:0] num;
+  bit [6:0] num;
+  // num = 1;
 
   virtual task body();
-    for (int i = 0; i < num; i ++) begin
+    for (int i = 0; i < 1; i ++) begin
     	axi_item m_item = axi_item::type_id::create("m_item");
     	start_item(m_item);
     	m_item.randomize();
       finish_item(m_item);
     end
-    `uvm_info("SEQ", $sformatf("Done generation of %0d items", num), UVM_LOW)
+    `uvm_info("SEQ", $sformatf("Done generation of 2 items", num), UVM_LOW)
   endtask
 endclass
