@@ -1,0 +1,9 @@
+sim/xcelium.d
+sim/tr_db.log
+sim/xrun.history
+sim/xrun.log
+sim/waveform.vcd
+sim/xrun.key
+sim/waves.shm
+sim/xcelium.shm
+sim/.simvision
