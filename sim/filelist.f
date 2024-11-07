@@ -43,6 +43,9 @@
 ../src/env.sv
 ../src/base_test.sv
 ../src/burst_test.sv
+
+//SVA
+../src/SVA.sv
  
             
 
