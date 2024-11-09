@@ -76,7 +76,7 @@ module SVA #(
 property handshake_pass_through_DUT (bit master, bit slave);
     @(posedge clk)
     disable iff (rst)
-    master |-> ##[1:5] slave;
+    master |-> ##[1:5] (slave == master);
 endproperty
 
 r_addr_valid_assert: assert property (handshake_pass_through_DUT(s_axi_arvalid, m_axil_arvalid)) else $display("ehre");
