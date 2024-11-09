@@ -69,7 +69,7 @@ class axi_driver extends uvm_driver #(axi_item);
         axi_vif.s_axi_awburst <= m_item.s_axi_awburst;
         // axi_vif.s_axi_awlock  <= m_item.s_axi_awlock;
         // axi_vif.s_axi_awcache <= m_item.s_axi_awcache;
-        // axi_vif.s_axi_awprot  <= m_item.s_axi_awprot;
+        axi_vif.s_axi_awprot  <= m_item.s_axi_awprot;
         @(posedge axi_vif.clk);
         axi_vif.s_axi_awvalid <= m_item.s_axi_awvalid;
         wait(axi_vif.s_axi_awready);

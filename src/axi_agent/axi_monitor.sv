@@ -36,21 +36,21 @@ class axi_monitor extends uvm_monitor;
             m_item.s_axi_awprot  = axi_vif.s_axi_awprot;
             m_item.s_axi_awvalid = axi_vif.s_axi_awvalid;
             m_item.s_axi_awready = axi_vif.s_axi_awready;
-            axi_mon_ap.write(m_item);
+            //axi_mon_ap.write(m_item);
 
             for (int i = 0; i <= axi_vif.s_axi_awlen; i++) begin
               wait (axi_vif.s_axi_wvalid && axi_vif.s_axi_wready);
               m_item_beat = axi_item::type_id::create("m_item_beat");
-              // m_item_beat.s_axi_awid    = m_item.s_axi_awid;
-              // m_item_beat.s_axi_awaddr  = m_item.s_axi_awaddr;
-              // m_item_beat.s_axi_awlen   = m_item.s_axi_awlen;
-              // m_item_beat.s_axi_awsize  = m_item.s_axi_awsize;
-              // m_item_beat.s_axi_awburst = m_item.s_axi_awburst;
-              // m_item_beat.s_axi_awlock  = m_item.s_axi_awlock;
-              // m_item_beat.s_axi_awcache = m_item.s_axi_awcache;
-              // m_item_beat.s_axi_awprot  = m_item.s_axi_awprot;
-              // m_item_beat.s_axi_awvalid = m_item.s_axi_awvalid;
-              // m_item_beat.s_axi_awready = m_item.s_axi_awready;
+              m_item_beat.s_axi_awid    = m_item.s_axi_awid;
+              m_item_beat.s_axi_awaddr  = m_item.s_axi_awaddr;
+              m_item_beat.s_axi_awlen   = m_item.s_axi_awlen;
+              m_item_beat.s_axi_awsize  = m_item.s_axi_awsize;
+              m_item_beat.s_axi_awburst = m_item.s_axi_awburst;
+              m_item_beat.s_axi_awlock  = m_item.s_axi_awlock;
+              m_item_beat.s_axi_awcache = m_item.s_axi_awcache;
+              m_item_beat.s_axi_awprot  = m_item.s_axi_awprot;
+              m_item_beat.s_axi_awvalid = m_item.s_axi_awvalid;
+              m_item_beat.s_axi_awready = m_item.s_axi_awready;
               // Write data line
               m_item_beat.s_axi_wdata   = axi_vif.s_axi_wdata;
               m_item_beat.s_axi_wstrb   = axi_vif.s_axi_wstrb;
@@ -61,14 +61,14 @@ class axi_monitor extends uvm_monitor;
               m_item_beat.s_axi_bid     = axi_vif.s_axi_bid;
               m_item_beat.s_axi_bresp   = axi_vif.s_axi_bresp;
               m_item_beat.s_axi_bvalid  = axi_vif.s_axi_bvalid;
-              m_item_beat.s_axi_bready  = axi_vif.s_axi_bready;        
+              m_item_beat.s_axi_bready  = axi_vif.s_axi_bready;     
               axi_mon_ap.write(m_item_beat);
               if (axi_vif.s_axi_wlast) begin
                 break;  // Exit the loop after the last data beat
               end
             end
         end
-
+/*
         if (axi_vif.s_axi_arvalid && axi_vif.s_axi_arready) begin
             // Read address line
             m_item.s_axi_arid    = axi_vif.s_axi_arid;
@@ -109,7 +109,7 @@ class axi_monitor extends uvm_monitor;
                 break;  // Exit the loop after the last data beat
               end
             end
-        end
+        end*/
     end
   endtask
 endclass

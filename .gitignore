@@ -10,3 +10,8 @@ sim/.simvision
 sim/xmvlog_4978.err
 sim/xmvlog_5180.err
 sim/xmvlog_5560.err
+sim/signals.svwf
+sim/simvision.dsn
+sim/simvision.trn
+sim/simvision48077.diag
+

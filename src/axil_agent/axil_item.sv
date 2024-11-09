@@ -140,4 +140,32 @@ class axil_item extends uvm_sequence_item;
 
    endfunction
 
+    virtual function string conv2str(bit [1:0] sel);
+        string s;
+        case(sel)
+         2'b00: begin
+                  // Write address line
+                  s = {s, $sformatf("  m_axil_awaddr: 0x%0h\n", m_axil_awaddr)};
+                  s = {s, $sformatf("  m_axil_awprot: %0d\n", m_axil_awprot)};
+                  s = {s, $sformatf("  m_axil_awvalid: %0d\n", m_axil_awvalid)};
+                  s = {s, $sformatf("  m_axil_awready: %0d\n", m_axil_awready)};
+                end
+         2'b01: begin
+                  // Write data line
+                  s = {s, $sformatf("  m_axil_wdata: 0x%0h\n", m_axil_wdata)};
+                  s = {s, $sformatf("  m_axil_wstrb: 0x%b\n", m_axil_wstrb)};
+                  s = {s, $sformatf("  m_axil_wvalid: %0d\n", m_axil_wvalid)};
+                  s = {s, $sformatf("  m_axil_wready: %0d\n", m_axil_wready)};
+                end
+         2'b10: begin
+                  // Write response line
+                  s = {s, $sformatf("  m_axil_bresp: %0d\n", m_axil_bresp)};
+                  s = {s, $sformatf("  m_axil_bvalid: %0d\n", m_axil_bvalid)};
+                  s = {s, $sformatf("  m_axil_bready: %0d\n", m_axil_bready)};
+                end
+         default: s = {s, $sformatf("  Do not recognize channel\n")};
+      endcase
+        return s;
+    endfunction
+
 endclass                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

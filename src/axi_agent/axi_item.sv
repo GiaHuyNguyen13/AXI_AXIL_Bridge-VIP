@@ -144,8 +144,8 @@ class axi_item extends uvm_sequence_item;
    }
 
    constraint prot_cache_zero {
-      s_axi_arprot == 3'b000;
-      s_axi_awprot == 3'b000;
+      //s_axi_arprot == 3'b000;
+      //s_axi_awprot == 3'b000;
       s_axi_arcache == 4'b0000;
       s_axi_awcache == 4'b0000;
    }

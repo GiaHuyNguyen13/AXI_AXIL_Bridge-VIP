@@ -30,29 +30,29 @@ class axil_monitor extends uvm_monitor;
             m_item.m_axil_awprot  = axil_vif.m_axil_awprot;
             m_item.m_axil_awvalid = axil_vif.m_axil_awvalid;
             m_item.m_axil_awready = axil_vif.m_axil_awready;
-            m_item.disp_aw(2'b00);
-            axil_mon_ap.write(m_item);
+            //m_item.disp_aw(2'b00);
+            //axil_mon_ap.write(m_item);
 
             wait (axil_vif.m_axil_wvalid && axil_vif.m_axil_wready);
-            m_item = axil_item::type_id::create("m_item");
+            //m_item = axil_item::type_id::create("m_item");
             // Write data line
             m_item.m_axil_wdata   = axil_vif.m_axil_wdata;
             m_item.m_axil_wstrb   = axil_vif.m_axil_wstrb;
             m_item.m_axil_wvalid  = axil_vif.m_axil_wvalid;
             m_item.m_axil_wready  = axil_vif.m_axil_wready;
-            m_item.disp_aw(2'b01);
+            //m_item.disp_aw(2'b01);
             axil_mon_ap.write(m_item);
 
-            wait (axil_vif.m_axil_bvalid && axil_vif.m_axil_bready);
-            m_item = axil_item::type_id::create("m_item");
-            // Write response line
-            m_item.m_axil_bresp   = axil_vif.m_axil_bresp;
-            m_item.m_axil_bvalid  = axil_vif.m_axil_bvalid;
-            m_item.m_axil_bready  = axil_vif.m_axil_bready;
-            m_item.disp_aw(2'b10);
-            axil_mon_ap.write(m_item);
+            // wait (axil_vif.m_axil_bvalid && axil_vif.m_axil_bready);
+            // m_item = axil_item::type_id::create("m_item");
+            // // Write response line
+            // m_item.m_axil_bresp   = axil_vif.m_axil_bresp;
+            // m_item.m_axil_bvalid  = axil_vif.m_axil_bvalid;
+            // m_item.m_axil_bready  = axil_vif.m_axil_bready;
+            // m_item.disp_aw(2'b10);
+            // axil_mon_ap.write(m_item);
         end
-
+/*
         if (axil_vif.m_axil_arvalid && axil_vif.m_axil_arready) begin
 
             // Read address line
@@ -71,7 +71,7 @@ class axil_monitor extends uvm_monitor;
             m_item.m_axil_rready  = axil_vif.m_axil_rready;
             axil_mon_ap.write(m_item);
 			  // axil_mon_ap.write(m_item); // send tempo item to analysis port, which will be sent to scoreboard
-		end
+		end*/
     end
     
   endtask
