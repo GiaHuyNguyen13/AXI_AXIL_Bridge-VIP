@@ -6,6 +6,7 @@ class scoreboard extends uvm_scoreboard;
     super.new(name, parent);
   endfunction
   
+  bit [7:0] blen;
   centralized_memory_model mem;
   uvm_analysis_imp_axi  #(axi_item, scoreboard) axi_analysis_imp;
   uvm_analysis_imp_axil #(axil_item, scoreboard) axil_analysis_imp;
@@ -18,6 +19,7 @@ class scoreboard extends uvm_scoreboard;
 
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
+    blen = 0;
     rd_ref_model = new();
     wr_ref_model = new();
     axi_analysis_imp = new("axi_analysis_imp", this);
@@ -29,7 +31,6 @@ class scoreboard extends uvm_scoreboard;
   endfunction
 
   virtual function write_axi(axi_item axi_item);
-      
     // Read transaction
     if (axi_item.s_axi_arvalid && axi_item.s_axi_arready) begin
       process_axi_rd_transaction(axi_item); // Pass the argument to ref model
@@ -41,14 +42,20 @@ class scoreboard extends uvm_scoreboard;
     // Write transaction
     end else if (axi_item.s_axi_wvalid && axi_item.s_axi_wready) begin
       `uvm_info("SCBD", $sformatf("Process axi write transaction"), UVM_LOW);
-      process_axi_wr_transaction(axi_item);
+      if (blen == 0) begin
+        process_axi_wr_transaction(axi_item);
+        blen++;
+      end else if (blen == axi_item.s_axi_awlen)
+        blen = 0;
+      else
+        blen++;
     end
   endfunction
 
   function void process_axi_wr_transaction(axi_item axi_tr);//axi_item axi_item);
     `uvm_info("SCBD", $sformatf("Generating expected axil write transaction"), UVM_LOW);
     wr_ref_model.create_expected_axil_sequence(axi_tr);
-
+    `uvm_info("SCBD", $sformatf("\n !!!!! Number of Generations: %d !!!!!\n",wr_ref_model.count_gen), UVM_LOW);
     // Access the populated axil_sequence as needed
     foreach (wr_ref_model.axil_sequence[i]) begin
           expected_axil_tx_q.push_back(wr_ref_model.axil_sequence[i]);
