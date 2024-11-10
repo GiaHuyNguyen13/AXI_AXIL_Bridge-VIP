@@ -6,6 +6,7 @@ class axil_gen_item_seq extends uvm_sequence;
 
   rand bit [6:0] num;
   rand bit op;
+  rand bit [7:0] len;
 
   virtual task body();
     for (int i = 0; i < num; i ++) begin
@@ -13,6 +14,7 @@ class axil_gen_item_seq extends uvm_sequence;
     	start_item(m_item);
     	m_item.randomize() with {
         operation == op;
+        num_beats == len;
       };
       finish_item(m_item);
     end

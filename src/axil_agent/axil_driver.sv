@@ -1,7 +1,10 @@
 class axil_driver extends uvm_driver #(axil_item);              
   `uvm_component_utils(axil_driver)
+
+  integer cnt;
   function new(string name = "axil_driver", uvm_component parent=null);
     super.new(name, parent);
+    cnt = 0;
   endfunction
   
   virtual axil_interface axil_vif;
@@ -74,13 +77,19 @@ class axil_driver extends uvm_driver #(axil_item);
    @(posedge axil_vif.clk);
       if (m_item.operation) begin // Write operation
         // `uvm_info("DRV", $sformatf("AXIL asadasdasdadfdasjkhlitem done"), UVM_HIGH)
-          wait (axil_vif.m_axil_wvalid);
+          //wait (axil_vif.m_axil_wvalid);
+          @(negedge axil_vif.m_axil_wvalid)
           //@(posedge axil_vif.clk);
           // axil_vif.m_axil_wready <= m_item.m_axil_wready;
           // repeat (2) @(posedge axil_vif.clk);
           // axil_vif.m_axil_wready <= 1'b0;
-          axil_vif.m_axil_bresp  <= m_item.m_axil_bresp;
+
           axil_vif.m_axil_bvalid <= m_item.m_axil_bvalid;
+          if (cnt == m_item.num_beats) begin
+            cnt = 0;
+            axil_vif.m_axil_bresp  <= m_item.m_axil_bresp;
+          end else
+            cnt++;
           @(posedge axil_vif.clk);
           axil_vif.m_axil_bvalid <= 1'b0;
           axil_vif.m_axil_bresp  <= '0;

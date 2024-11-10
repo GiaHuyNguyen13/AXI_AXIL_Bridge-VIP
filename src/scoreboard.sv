@@ -55,7 +55,6 @@ class scoreboard extends uvm_scoreboard;
   function void process_axi_wr_transaction(axi_item axi_tr);//axi_item axi_item);
     `uvm_info("SCBD", $sformatf("Generating expected axil write transaction"), UVM_LOW);
     wr_ref_model.create_expected_axil_sequence(axi_tr);
-    `uvm_info("SCBD", $sformatf("\n !!!!! Number of Generations: %d !!!!!\n",wr_ref_model.count_gen), UVM_LOW);
     // Access the populated axil_sequence as needed
     foreach (wr_ref_model.axil_sequence[i]) begin
           expected_axil_tx_q.push_back(wr_ref_model.axil_sequence[i]);

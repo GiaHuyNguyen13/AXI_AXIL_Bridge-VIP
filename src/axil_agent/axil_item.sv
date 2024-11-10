@@ -2,6 +2,7 @@ class axil_item extends uvm_sequence_item;
     `uvm_object_utils(axil_item)
 
    rand bit         operation; // 0 for read, 1 for write
+   rand bit [7:0]   num_beats; // temp value of burst length, "Check the number of beats received, and if it's the last beat, assert m_axil_bresp."
 
    // Write address line
         bit [31:0]  m_axil_awaddr;
@@ -42,6 +43,11 @@ class axil_item extends uvm_sequence_item;
       soft operation == 1'b1;
    } 
 
+   constraint c_num_beats {
+      // m_axil_arready inside {2'b00, 2'b10, 2'b11};
+      soft num_beats == 7'b0000000;
+   } 
+
    constraint c_m_axil_arready {
       // m_axil_arready inside {2'b00, 2'b10, 2'b11};
       m_axil_arready == 1'b1;
@@ -54,6 +60,7 @@ class axil_item extends uvm_sequence_item;
 
    constraint c_m_axil_bresp {
       m_axil_bresp inside {2'b00, 2'b10, 2'b11};
+      //m_axil_bresp == 2'b00;
    } 
 
    constraint c_m_axil_rresp {
