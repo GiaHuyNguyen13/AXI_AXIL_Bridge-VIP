@@ -13,5 +13,7 @@ sim/xmvlog_5560.err
 sim/signals.svwf
 sim/simvision.dsn
 sim/simvision.trn
-sim/simvision48077.diag
-
+sim/*.diag
+sim/cov_work/
+sim/.bpad/
+sim/verilog.dump

@@ -73,13 +73,189 @@ module SVA #(
     input  wire                        m_axil_rvalid
 );
 
-property handshake_pass_through_DUT (bit master, bit slave);
+property handshake_valid_pass_through_DUT (bit master, bit slave);
     @(posedge clk)
     disable iff (rst)
     master |-> ##[1:5] (slave == master);
 endproperty
 
-r_addr_valid_assert: assert property (handshake_pass_through_DUT(s_axi_arvalid, m_axil_arvalid)) else $display("ehre");
+property handshake_ready_pass_through_DUT (bit master, bit slave);
+    @(posedge clk)
+    disable iff (rst)
+    slave |-> (slave == !master);
+endproperty
+
+property handshake_transaction (bit valid, bit ready);
+    @(posedge clk)
+    disable iff (rst)
+    valid |-> ##[0:3] ready;
+endproperty
+
+property b_valid_condition ();
+    @(posedge clk)
+    disable iff (rst)
+    (s_axi_wlast == 1'b1) [*3] |-> ##3 s_axi_bvalid;
+endproperty
+
+property success_data_after_handshake (bit valid, bit ready, bit data);
+    @(posedge clk)
+    disable iff (rst)
+    (valid && ready) |-> ##[0:1] data;
+endproperty
+
+property success_data_after_addr (bit addr_valid, bit addr_ready, bit data);
+    @(posedge clk)
+    disable iff (rst)
+    (addr_valid && addr_ready) |-> ##[0:1] data;
+endproperty
+
+property valid_resp_value (bit resp_value, bit signal);
+    @(posedge clk)
+    disable iff (rst)
+    signal |-> ##[0:3] ((resp_value == 0) || (resp_value == 2) || (resp_value == 3));
+endproperty
+
+/*=============== VALID RESP VALUE  ===============*/
+
+valid_r_resp_assert: assert property (
+    valid_resp_value(s_axi_rresp, s_axi_rvalid)
+);
+
+valid_b_resp_assert: assert property (
+    valid_resp_value(s_axi_bresp, s_axi_bvalid)
+);
+/*====================================================================*/
+
+
+/*=============== HAVE DATA AFTER RECEIVE ADDRESS ===============*/
+
+r_data_after_addr_assert: assert property (
+    success_data_after_addr(s_axi_arvalid, s_axi_arready, s_axi_rdata)
+);
+
+w_data_after_addr_assert: assert property (
+    success_data_after_addr(s_axi_awvalid, s_axi_awready, s_axi_wdata)
+);
+
+/*====================================================================*/
+
+
+/*=============== HAVE DATA AFTER HANDSHAKING COMPLETE ===============*/
+
+ar_receive_success_assert: assert property (
+    success_data_after_handshake(s_axi_arvalid, s_axi_arready, s_axi_araddr)
+);
+
+aw_receive_success_assert: assert property (
+    success_data_after_handshake(s_axi_awvalid, s_axi_awready, s_axi_awaddr)
+);
+
+w_receive_success_assert: assert property (
+    success_data_after_handshake(s_axi_wvalid, s_axi_wready, s_axi_wdata)
+);
+
+b_receive_success_assert: assert property (
+    success_data_after_handshake(s_axi_bvalid, s_axi_bready, s_axi_bresp | 1'b1)
+);
+
+r_receive_success_assert: assert property (
+    success_data_after_handshake(s_axi_rvalid, s_axi_rready, s_axi_rdata)
+);
+
+/*====================================================================*/
+
+
+/*=============== BVALID GENERATION ===============*/
+
+b_valid_assert: assert property (
+    b_valid_condition()
+);
+
+/*=================================================*/
+
+
+/*=============== HANDSHAKING SIGNALS INITIATING TRANSACTIONS ===============*/
+
+ar_assert: assert property (
+    handshake_transaction(s_axi_arvalid, s_axi_arready)
+);
+
+r_assert: assert property (
+    handshake_transaction(s_axi_rvalid, s_axi_rready)
+);
+
+aw_assert: assert property (
+    handshake_transaction(s_axi_awvalid, s_axi_awready)
+);
+
+w_assert: assert property (
+    handshake_transaction(s_axi_wvalid, s_axi_wready)
+);
+
+b_assert: assert property (
+    handshake_transaction(s_axi_bvalid, s_axi_bready)
+);
+
+/*===========================================================================*/
+
+
+/*=============== PASSING HANDSHAKING SIGNALS THROUGH THE DUT SUCCESSFULLY ===============*/
+
+// ARVALID Propagation
+r_addr_valid_assert: assert property (
+    handshake_valid_pass_through_DUT(s_axi_arvalid, m_axil_arvalid)
+);
+
+// // ARREADY Propagation
+// r_addr_ready_assert: assert property (
+//     handshake_ready_pass_through_DUT(m_axil_arready, s_axi_arvalid)
+// );
+    
+// AWVALID Propagation
+w_addr_valid_assert: assert property (
+    handshake_valid_pass_through_DUT(s_axi_awvalid, m_axil_awvalid)
+);
+
+// // AWREADY Propagation
+// w_addr_ready_assert: assert property (
+//     handshake_ready_pass_through_DUT(m_axil_awready, s_axi_awvalid)
+// );
+
+// WVALID Propagation
+w_data_valid_assert: assert property (
+    handshake_valid_pass_through_DUT(s_axi_wvalid, m_axil_wvalid)
+);
+
+// // WREADY Propagation
+// w_data_ready_assert: assert property (
+//     handshake_ready_pass_through_DUT(m_axil_wready, s_axi_wvalid)
+// );
+
+// BVALID Propagation
+b_resp_valid_assert: assert property (
+    handshake_valid_pass_through_DUT(m_axil_bvalid, s_axi_bvalid)
+);
+
+// // BREADY Propagation
+// b_resp_ready_assert: assert property (
+//     handshake_ready_pass_through_DUT(s_axi_bready, m_axil_bvalid)
+// );
+
+// RVALID Propagation
+r_data_valid_assert: assert property (
+    handshake_valid_pass_through_DUT(m_axil_rvalid, s_axi_rvalid)
+);
+
+// // RREADY Propagation
+// r_data_ready_assert: assert property (
+//     handshake_ready_pass_through_DUT(s_axi_rready, m_axil_rvalid)
+// );
+
+/*========================================================================================*/
+
+
+
+// r_addr_valid_assert: assert property (handshake_pass_through_DUT(s_axi_arvalid, m_axil_arvalid));
 // r_addr_valid_cover: cover property (handshake_pass_through_DUT(s_axi_arvalid, m_axil_arvalid));
 
 endmodule : SVA

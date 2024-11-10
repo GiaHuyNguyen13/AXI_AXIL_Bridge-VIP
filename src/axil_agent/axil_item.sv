@@ -53,7 +53,7 @@ class axil_item extends uvm_sequence_item;
    } 
 
    constraint c_m_axil_bresp {
-      m_axil_rresp inside {2'b00, 2'b10, 2'b11};
+      m_axil_bresp inside {2'b00, 2'b10, 2'b11};
    } 
 
    constraint c_m_axil_rresp {

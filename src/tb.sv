@@ -19,8 +19,8 @@ module tb;
 
   // Reset gen
   initial begin
-    repeat (50000) @(posedge clk);
-    $finish;
+    repeat (1000) @(posedge clk);
+    $finish();
   end
 
   initial begin
