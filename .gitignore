@@ -17,3 +17,5 @@ sim/*.diag
 sim/cov_work/
 sim/.bpad/
 sim/verilog.dump
+sim/waveform.dsn
+sim/waveform.trn
