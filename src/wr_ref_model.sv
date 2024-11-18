@@ -49,6 +49,16 @@ class axi_axil_adapter_wr_ref_model;
       axil_sequence.push_back(expected_axil_tr_seq);  // Use push_back with the queue
     end
   endfunction
+
+  function axi_item create_expected_axi_bchan(axil_item axil_tr);
+    axi_item expected_axi_bchannel = axi_item::type_id::create("expected_axi_bchannel");
+
+    expected_axi_bchannel.s_axi_bresp = axil_tr.m_axil_bresp;
+    expected_axi_bchannel.s_axi_bvalid = axil_tr.m_axil_bvalid;
+    expected_axi_bchannel.s_axi_bready = axil_tr.m_axil_bready;
+
+    return expected_axi_bchannel;
+  endfunction
   // // Handle for the centralized memory model
   // centralized_memory_model mem;
 

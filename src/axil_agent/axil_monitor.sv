@@ -1,17 +1,23 @@
 class axil_monitor extends uvm_monitor;
    `uvm_component_utils (axil_monitor)
+   bit [7:0] cnt;
    function new (string name="axil_monitor", uvm_component parent);
       super.new (name, parent);
+      cnt = 7'b0000000;
    endfunction
 
+   bit [7:0] blen;
    uvm_analysis_port #(axil_item)  axil_mon_ap;
    virtual axil_interface          axil_vif;
 
   virtual function void build_phase (uvm_phase phase);
-  super.build_phase(phase);
-  if (!uvm_config_db #(virtual axil_interface)::get(this, "", "axil_interface", axil_vif))
-      `uvm_fatal("MON", "Could not get axil_vif")
-    axil_mon_ap = new ("axil_mon_ap", this); // create analysis port
+      super.build_phase(phase);
+      if (!uvm_config_db #(virtual axil_interface)::get(this, "*", "axil_interface", axil_vif))
+          `uvm_fatal("MON", "Could not get axil_vif")
+      axil_mon_ap = new ("axil_mon_ap", this); // create analysis port
+      if (!uvm_config_db#(bit[7:0])::get(this, "", "burst_len", blen)) begin
+          `uvm_fatal("CONFIG_ERR", "Could not get burst_len from config DB.")
+      end 
   endfunction
 
   virtual task run_phase (uvm_phase phase);
@@ -43,16 +49,21 @@ class axil_monitor extends uvm_monitor;
             //m_item.disp_aw(2'b01);
             axil_mon_ap.write(m_item);
 
-            // wait (axil_vif.m_axil_bvalid && axil_vif.m_axil_bready);
-            // m_item = axil_item::type_id::create("m_item");
-            // // Write response line
-            // m_item.m_axil_bresp   = axil_vif.m_axil_bresp;
-            // m_item.m_axil_bvalid  = axil_vif.m_axil_bvalid;
-            // m_item.m_axil_bready  = axil_vif.m_axil_bready;
-            // m_item.disp_aw(2'b10);
-            // axil_mon_ap.write(m_item);
+            if (cnt == blen) begin
+                cnt = 7'b0000000;
+                wait (axil_vif.m_axil_bvalid && axil_vif.m_axil_bready);
+                m_item = axil_item::type_id::create("m_item");
+                // // Write response line
+                m_item.m_axil_bresp   = axil_vif.m_axil_bresp;
+                m_item.m_axil_bvalid  = axil_vif.m_axil_bvalid;
+                m_item.m_axil_bready  = axil_vif.m_axil_bready;
+                // m_item.disp_aw(2'b10);
+                axil_mon_ap.write(m_item);
+            end
+            else 
+                cnt++;
         end
-/*
+
         if (axil_vif.m_axil_arvalid && axil_vif.m_axil_arready) begin
 
             // Read address line
@@ -71,7 +82,7 @@ class axil_monitor extends uvm_monitor;
             m_item.m_axil_rready  = axil_vif.m_axil_rready;
             axil_mon_ap.write(m_item);
 			  // axil_mon_ap.write(m_item); // send tempo item to analysis port, which will be sent to scoreboard
-		end*/
+		end
     end
     
   endtask

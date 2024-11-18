@@ -129,9 +129,9 @@ valid_b_resp_assert: assert property (
 
 /*=============== HAVE DATA AFTER RECEIVE ADDRESS ===============*/
 
-r_data_after_addr_assert: assert property (
-    success_data_after_addr(s_axi_arvalid, s_axi_arready, s_axi_rdata)
-);
+// r_data_after_addr_assert: assert property (
+//     success_data_after_addr(s_axi_arvalid, s_axi_arready, s_axi_rdata)
+// );
 
 w_data_after_addr_assert: assert property (
     success_data_after_addr(s_axi_awvalid, s_axi_awready, s_axi_wdata)

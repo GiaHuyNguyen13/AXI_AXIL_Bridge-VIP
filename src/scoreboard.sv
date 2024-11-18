@@ -6,6 +6,7 @@ class scoreboard extends uvm_scoreboard;
     super.new(name, parent);
   endfunction
   
+  bit [0:0] rwop;
   bit [7:0] blen;
   centralized_memory_model mem;
   uvm_analysis_imp_axi  #(axi_item, scoreboard) axi_analysis_imp;
@@ -15,11 +16,17 @@ class scoreboard extends uvm_scoreboard;
 
   axil_item expected_axil_tx_q[$];
   axil_item actual_axil_tx_q[$];
+  
+  axi_item expected_axi_tx_q[$];
+  axi_item actual_axi_tx_q[$];
+
   axil_item temp_axil_item;
+  axi_item temp_axi_item; // add
 
   virtual function void build_phase(uvm_phase phase);
     super.build_phase(phase);
     blen = 0;
+    rwop = 0;
     rd_ref_model = new();
     wr_ref_model = new();
     axi_analysis_imp = new("axi_analysis_imp", this);
@@ -32,24 +39,34 @@ class scoreboard extends uvm_scoreboard;
 
   virtual function write_axi(axi_item axi_item);
     // Read transaction
-    if (axi_item.s_axi_arvalid && axi_item.s_axi_arready) begin
-      process_axi_rd_transaction(axi_item); // Pass the argument to ref model
-    end else if (axi_item.s_axi_rvalid && axi_item.s_axi_rready) begin
-      
-      if (expected_axil_tx_q.size()) temp_axil_item = expected_axil_tx_q.pop_front();
-      // if (axi_item.s_axi_rdata != temp_axil_item.m_axil_rdata) `uvm_info("SB", $sformatf("Read data mismatched"), UVM_HIGH)
-      // else begin `uvm_info("SB", $sformatf("Read data is correct"), UVM_HIGH) end
-    // Write transaction
+
+    if (axi_item.s_axi_rvalid && axi_item.s_axi_rready) begin
+      `uvm_info("SCBD", $sformatf("Process axi read transaction"), UVM_LOW);
+
+      if (blen == 0) begin
+        process_axi_rd_transaction(axi_item);
+        process_actual_axi_transaction(axi_item);
+        blen++;
+      end else begin
+        process_actual_axi_transaction(axi_item);
+        blen++;
+      end
+
+      if (blen == axi_item.s_axi_arlen + 1) begin
+        `uvm_info("SCBD", $sformatf("Blen reset here"), UVM_LOW);
+        blen = 0;
+      end 
+
+      // Write transaction
     end else if (axi_item.s_axi_wvalid && axi_item.s_axi_wready) begin
       `uvm_info("SCBD", $sformatf("Process axi write transaction"), UVM_LOW);
-      if (blen == 0) begin
-        process_axi_wr_transaction(axi_item);
-        blen++;
-      end else if (blen == axi_item.s_axi_awlen)
-        blen = 0;
-      else
-        blen++;
+      if (blen == 0) process_axi_wr_transaction(axi_item);
+      blen = (blen == axi_item.s_axi_awlen) ? 0 : blen + 1;
+    end else if (axi_item.s_axi_bvalid && axi_item.s_axi_bready) begin
+
+        actual_axi_tx_q.push_back(axi_item);
     end
+
   endfunction
 
   function void process_axi_wr_transaction(axi_item axi_tr);//axi_item axi_item);
@@ -59,122 +76,66 @@ class scoreboard extends uvm_scoreboard;
     foreach (wr_ref_model.axil_sequence[i]) begin
           expected_axil_tx_q.push_back(wr_ref_model.axil_sequence[i]);
     end
-
- 
-    // axil_item expected_axil_tx[];  // Temporary storage for the expected transactions
-
-    //  // Generate the expected sequence of AXI-Lite transactions
-    // //axil_item[] expected_axil_sequence = ref_model.create_expected_axil_sequence(axi_tr);
-
-    // // Compare each expected transaction with the actual transaction
-    // if (expected_axil_sequence.size() != actual_axil_sequence.size()) begin
-    //   `uvm_error("AXI_AXIL_SB", "Size mismatch between expected and actual AXI-Lite transaction sequences")
-    //   return;
-    // end
-
-    // for (int i = 0; i < expected_axil_sequence.size(); i++) begin
-    //   axil_item expected_tr = expected_axil_sequence[i];
-    //   axil_item actual_tr = actual_axil_sequence[i];
-
-    //   if (expected_tr.awaddr !== actual_tr.awaddr) begin
-    //     `uvm_error("AXI_AXIL_SB", $sformatf("Address mismatch: Expected awaddr=%0h, Actual awaddr=%0h", expected_tr.awaddr, actual_tr.awaddr))
-    //   end
-
-    //   if (expected_tr.wdata !== actual_tr.wdata) begin
-    //     `uvm_error("AXI_AXIL_SB", $sformatf("Data mismatch: Expected wdata=%0h, Actual wdata=%0h", expected_tr.wdata, actual_tr.wdata))
-    //   end
-
-    //   if (expected_tr.wstrb !== actual_tr.wstrb) begin
-    //     `uvm_error("AXI_AXIL_SB", $sformatf("Write strobe mismatch: Expected wstrb=%0b, Actual wstrb=%0b", expected_tr.wstrb, actual_tr.wstrb))
-    //   end
-    //end
-    // // Check if the transaction is a write transaction
-    // if (axi_item.operation) begin  // Assuming 1 means write
-    //   `uvm_info("AXI_TO_AXIL_CHECK", "Processing AXI write transaction...", UVM_LOW);
-      
-    //   // Process the write request using the reference model
-    //   wr_ref_model.axi_write_request(axi_item);
-      
-      
-    //   /*
-    //   // Convert the AXI burst into expected AXI-Lite transactions
-    //   wr_ref_model.convert_burst_to_axil_write(expected_axil_tx);*/
-
-    //   // Store the expected AXI-Lite transactions in the queue for later comparison
-    //   foreach (expected_axil_tx[i]) begin
-    //     expected_axil_tx_q.push_back(expected_axil_tx[i]);
-    //   end
-    //   `uvm_info("AXI_TO_AXIL_CHECK", $sformatf("Stored %0d expected AXI-Lite transactions for write", expected_axil_tx.size()), UVM_LOW);
-    // end
   endfunction
 
-
-
     virtual function write_axil(axil_item axil_item);
-       if (axil_item.m_axil_awvalid && axil_item.m_axil_awready)
-          process_axil_wr_transaction(axil_item);
-    //   `uvm_info("AXI_SCOREBOARD", $sformatf("\nReceived item from monitor:\n%s", axil_item.conv2str(2'b00)), UVM_LOW);
-
-    //   if (axil_item.m_axil_wvalid && axil_item.m_axil_wready)
-    //   `uvm_info("AXI_SCOREBOARD", $sformatf("\nReceived item from monitor:\n%s", axil_item.conv2str(2'b01)), UVM_LOW);
-
-    //   if (axil_item.m_axil_bvalid && axil_item.m_axil_bready)
-    //   `uvm_info("AXI_SCOREBOARD", $sformatf("\nReceived item from monitor:\n%s", axil_item.conv2str(2'b10)), UVM_LOW);
-     
-    //   /*if (axil_item.m_axil_wvalid && axil_item.m_axil_wready) begin
-    //     if (expected_axil_tx_q.size()) temp_axil_item = expected_axil_tx_q.pop_front(); begin
-    //       // if (axil_item.m_axil_wdata != temp_axil_item.m_axil_wdata) `uvm_info("SB", $sformatf("Write data mismatched"), UVM_HIGH)
-    //       // else begin `uvm_info("SB", $sformatf("Write data is correct"), UVM_HIGH) end
-    //     end
-    //   end*/
+      if (axil_item.m_axil_awvalid && axil_item.m_axil_awready)
+          process_actual_axil_transaction(axil_item);
+      if (axil_item.m_axil_arvalid && axil_item.m_axil_arready)
+          process_actual_axil_transaction(axil_item);
+      if (axil_item.m_axil_bvalid && axil_item.m_axil_bready)
+          expected_axi_tx_q.push_back(wr_ref_model.create_expected_axi_bchan(axil_item));
     endfunction
 
-    function void process_axil_wr_transaction(axil_item axil_tr);//axi_item axi_item);
+    function void process_actual_axil_transaction(axil_item axil_tr);//axi_item axi_item);
       `uvm_info("SCBD", $sformatf("Receiving actual axil transaction"), UVM_LOW);
         actual_axil_tx_q.push_back(axil_tr);
-
     endfunction
 
-
-  function void process_axi_rd_transaction(axi_item axi_item);
-    axil_item expected_axil_tx[];  // Temporary storage for the expected transactions
-
-    // Check if the transaction is a read transaction
-    if (!axi_item.operation) begin  // Assuming 0 means read
-      `uvm_info("AXI_TO_AXIL_CHECK", "Processing AXI read transaction...", UVM_LOW);
-      
-      // Process the read request using the reference model
-      rd_ref_model.axi_read_request(axi_item);
-      
-      // Convert the AXI burst into expected AXI-Lite transactions
-      rd_ref_model.convert_burst_to_axil(expected_axil_tx);
-
-      // Store the expected AXI-Lite transactions in the queue for later comparison
-      foreach (expected_axil_tx[i]) begin
-        expected_axil_tx_q.push_back(expected_axil_tx[i]);
-      end
-      `uvm_info("AXI_TO_AXIL_CHECK", $sformatf("Stored %0d expected AXI-Lite transactions", expected_axil_tx.size()), UVM_LOW);
+  function void process_axi_rd_transaction(axi_item axi_tr);
+    `uvm_info("SCBD", $sformatf("Generating expected axi read transaction"), UVM_LOW);
+    rd_ref_model.create_expected_rd_sequence(axi_tr);
+    // Access the populated axil_sequence as needed
+    foreach (rd_ref_model.axi_sequence[i]) begin
+          expected_axi_tx_q.push_back(rd_ref_model.axi_sequence[i]);
     end
+    foreach (rd_ref_model.axil_sequence[i]) begin
+          expected_axil_tx_q.push_back(rd_ref_model.axil_sequence[i]);
+    end
+  endfunction
+
+  function void process_actual_axi_transaction(axi_item axi_item);
+    `uvm_info("SCBD", $sformatf("Receiving actual axi transaction"), UVM_LOW);
+        actual_axi_tx_q.push_back(axi_item);
   endfunction
 
 
      // Check phase to compare expected and actual AXI-Lite transactions
  function void check_phase(uvm_phase phase);
     super.check_phase(phase);
-    `uvm_info("SCBD", "Starting check phase for AXI write transactions", UVM_LOW);
+    `uvm_info("SCBD", "Starting check phase for transactions", UVM_LOW);
 
+    // axi_item expected_axi_tr;
+    // axi_item actual_axi_tr;
     // Compare expected and actual transactions
     if (expected_axil_tx_q.size() != actual_axil_tx_q.size()) begin
-      `uvm_error("SCBD", $sformatf("Mismatch in transaction count: Expected %0d, Actual %0d",
+      `uvm_error("SCBD", $sformatf("Mismatch in WRITE transaction count: Expected %0d, Actual %0d",
                                    expected_axil_tx_q.size(), actual_axil_tx_q.size()))
       return;
     end
 
+    // Compare expected and actual READ transactions
+    if (expected_axi_tx_q.size() != actual_axi_tx_q.size()) begin
+      `uvm_error("SCBD", $sformatf("Mismatch in READ transaction count: Expected %0d, Actual %0d",
+                                   expected_axi_tx_q.size(), actual_axi_tx_q.size()))
+      return;
+    end
     for (int i = 0; i < expected_axil_tx_q.size(); i++) begin
       axil_item expected_tr = expected_axil_tx_q[i];
       axil_item actual_tr = actual_axil_tx_q[i];
 
-      if (expected_tr.m_axil_awaddr !== actual_tr.m_axil_awaddr) begin
+
+      if (expected_tr.m_axil_awaddr != actual_tr.m_axil_awaddr) begin
         `uvm_error("SCBD", $sformatf("Address mismatch at transaction %0d: Expected awaddr=%0h, Actual awaddr=%0h", 
                                      i, expected_tr.m_axil_awaddr, actual_tr.m_axil_awaddr));
       end else begin
@@ -182,7 +143,7 @@ class scoreboard extends uvm_scoreboard;
                                      i, expected_tr.m_axil_awaddr, actual_tr.m_axil_awaddr),UVM_LOW);
       end
 
-      if (expected_tr.m_axil_awprot !== actual_tr.m_axil_awprot) begin
+      if (expected_tr.m_axil_awprot != actual_tr.m_axil_awprot) begin
         `uvm_error("SCBD", $sformatf("Write protection mismatch at transaction %0d: Expected awprot=%0b, Actual awprot=%0b", 
                                      i, expected_tr.m_axil_awprot, actual_tr.m_axil_awprot));
       end else begin
@@ -190,7 +151,7 @@ class scoreboard extends uvm_scoreboard;
                                      i, expected_tr.m_axil_awprot, actual_tr.m_axil_awprot),UVM_LOW);
       end
 
-      if (expected_tr.m_axil_wdata !== actual_tr.m_axil_wdata) begin
+      if (expected_tr.m_axil_wdata != actual_tr.m_axil_wdata) begin
         `uvm_error("SCBD", $sformatf("Data mismatch at transaction %0d: Expected wdata=0x%0h, Actual wdata=0x%0h", 
                                      i, expected_tr.m_axil_wdata, actual_tr.m_axil_wdata));
       end else begin
@@ -198,7 +159,7 @@ class scoreboard extends uvm_scoreboard;
                                      i, expected_tr.m_axil_wdata, actual_tr.m_axil_wdata),UVM_LOW);
       end
 
-      if (expected_tr.m_axil_wstrb !== actual_tr.m_axil_wstrb) begin
+      if (expected_tr.m_axil_wstrb != actual_tr.m_axil_wstrb) begin
         `uvm_error("SCBD", $sformatf("Write strobe mismatch at transaction %0d: Expected wstrb=%b, Actual wstrb=%b", 
                                      i, expected_tr.m_axil_wstrb, actual_tr.m_axil_wstrb));
       end else begin
@@ -207,10 +168,73 @@ class scoreboard extends uvm_scoreboard;
       end
       
     end
+
+
+      `uvm_info("SCBD", $sformatf("\nSize of exp_axi :%0d \n Size of act_axi :%0d", 
+                                     expected_axi_tx_q.size(), actual_axi_tx_q.size()),UVM_LOW);
+      // axi_item expected_axi_tr;
+      // axi_item actual_axi_tr;
+      for (int k = 0; k < expected_axi_tx_q.size(); k++) begin
+       
+          //`uvm_info("SCBD", $sformatf("AXI I'm in"), UVM_HIGH);
+          axi_item expected_axi_tr = expected_axi_tx_q[k];//.pop_front();
+          axi_item actual_axi_tr = actual_axi_tx_q[k];//.pop_front();
+
+          if (expected_axi_tr.s_axi_bresp != actual_axi_tr.s_axi_bresp) begin
+            `uvm_error("SCBD", $sformatf("Write response mismatch at transaction %0d: Expected bresp=%b, Actual bresp=%b", 
+                                       k, expected_axi_tr.s_axi_bresp, actual_axi_tr.s_axi_bresp));
+          end else begin
+            `uvm_info("SCBD", $sformatf("\nWrite response match at transaction %0d:\n Expected bresp=%b, Actual bresp=%b\n\n", 
+                                       k, expected_axi_tr.s_axi_bresp, actual_axi_tr.s_axi_bresp),UVM_LOW);
+          end
+
+        
+      end
+    
+    for (int j = 0; j < expected_axi_tx_q.size(); j++) begin
+      axi_item expected_rd_tr = expected_axi_tx_q[j];
+      axi_item actual_rd_tr = actual_axi_tx_q[j];
+
+      if (expected_rd_tr.s_axi_rdata != actual_rd_tr.s_axi_rdata) begin
+        `uvm_error("SCBD", $sformatf("Data mismatch at transaction %0d: Expected rdata=0x%0h, Actual rdata=0x%0h", 
+                                     j, expected_rd_tr.s_axi_rdata, actual_rd_tr.s_axi_rdata));
+      end else begin
+        `uvm_info("SCBD", $sformatf("\nData match at transaction %0d:\n Expected rdata=%0h, Actual rdata=%0h", 
+                                     j, expected_rd_tr.s_axi_rdata, actual_rd_tr.s_axi_rdata),UVM_LOW);
+      end
+
+      if (expected_rd_tr.s_axi_rid != actual_rd_tr.s_axi_rid) begin
+        `uvm_error("SCBD", $sformatf("Read ID mismatch at transaction %0d: Expected rid=%b, Actual rid=%b", 
+                                     j, expected_rd_tr.s_axi_rid, actual_rd_tr.s_axi_rid));
+      end else begin
+        `uvm_info("SCBD", $sformatf("\nRead ID match at transaction %0d:\n Expected rid=%b, Actual rid=%b\n\n", 
+                                     j, expected_rd_tr.s_axi_rid, actual_rd_tr.s_axi_rid),UVM_LOW);
+      end
+      
+    end
+
+    for (int l = 0; l < expected_axi_tx_q.size(); l++) begin
+      axil_item expected_rd_axil_tr = expected_axil_tx_q[l];
+      axil_item actual_rd_axil_tr = actual_axil_tx_q[l];
+
+          if (expected_rd_axil_tr.m_axil_araddr != actual_rd_axil_tr.m_axil_araddr) begin
+        `uvm_error("SCBD", $sformatf("Address mismatch at transaction %0d: Expected araddr=%0h, Actual araddr=%0h", 
+                                     l, expected_rd_axil_tr.m_axil_araddr, actual_rd_axil_tr.m_axil_araddr));
+      end else begin
+        `uvm_info("SCBD", $sformatf("\nAddress match at transaction %0d:\n Expected araddr=0x%0h, Actual araddr=0x%0h", 
+                                     l, expected_rd_axil_tr.m_axil_araddr, actual_rd_axil_tr.m_axil_araddr),UVM_LOW);
+      end
+
+      if (expected_rd_axil_tr.m_axil_arprot != actual_rd_axil_tr.m_axil_arprot) begin
+        `uvm_error("SCBD", $sformatf("Read protection mismatch at transaction %0d: Expected arprot=%0b, Actual arprot=%0b", 
+                                     l, expected_rd_axil_tr.m_axil_arprot, actual_rd_axil_tr.m_axil_arprot));
+      end else begin
+        `uvm_info("SCBD", $sformatf("\nRead protection match at transaction %0d:\n Expected arprot=%0b, Actual arprot=%0b\n", 
+                                     l, expected_rd_axil_tr.m_axil_arprot, actual_rd_axil_tr.m_axil_arprot),UVM_LOW);
+      end
+
+    end
+
     `uvm_info("SCBD", "Check phase completed successfully", UVM_LOW);
   endfunction
-
-  
-
-
 endclass

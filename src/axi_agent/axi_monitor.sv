@@ -57,18 +57,26 @@ class axi_monitor extends uvm_monitor;
               m_item_beat.s_axi_wlast   = axi_vif.s_axi_wlast;
               m_item_beat.s_axi_wvalid  = axi_vif.s_axi_wvalid;
               m_item_beat.s_axi_wready  = axi_vif.s_axi_wready;
-              // Write response line
-              m_item_beat.s_axi_bid     = axi_vif.s_axi_bid;
-              m_item_beat.s_axi_bresp   = axi_vif.s_axi_bresp;
-              m_item_beat.s_axi_bvalid  = axi_vif.s_axi_bvalid;
-              m_item_beat.s_axi_bready  = axi_vif.s_axi_bready;     
               axi_mon_ap.write(m_item_beat);
+              
+              if (i == axi_vif.s_axi_awlen) begin
+              
+              wait (axi_vif.s_axi_bvalid && axi_vif.s_axi_bready);
+              //`uvm_info("AXI_MON", $sformatf("AXI I'm in"), UVM_HIGH)
+                  // Write response line
+                  m_item.s_axi_bid     = axi_vif.s_axi_bid;
+                  m_item.s_axi_bresp   = axi_vif.s_axi_bresp;
+                  m_item.s_axi_bvalid  = axi_vif.s_axi_bvalid;
+                  m_item.s_axi_bready  = axi_vif.s_axi_bready;     
+                  `uvm_info("AXI_MON", $sformatf("m_item_beat.s_axi_bready: %0d",axi_vif.s_axi_bready), UVM_HIGH)
+                  axi_mon_ap.write(m_item);
+              end
               if (axi_vif.s_axi_wlast) begin
                 break;  // Exit the loop after the last data beat
               end
             end
         end
-/*
+
         if (axi_vif.s_axi_arvalid && axi_vif.s_axi_arready) begin
             // Read address line
             m_item.s_axi_arid    = axi_vif.s_axi_arid;
@@ -81,22 +89,22 @@ class axi_monitor extends uvm_monitor;
             m_item.s_axi_arprot  = axi_vif.s_axi_arprot;
             m_item.s_axi_arvalid = axi_vif.s_axi_arvalid;
             m_item.s_axi_arready = axi_vif.s_axi_arready;
-            axi_mon_ap.write(m_item);   
+            // axi_mon_ap.write(m_item);   
 
             for (int i = 0; i <= axi_vif.s_axi_arlen; i++) begin
               wait (axi_vif.s_axi_rvalid && axi_vif.s_axi_rready);
               m_item_beat = axi_item::type_id::create("m_item_beat");
               // Read address line
-              // m_item_beat.s_axi_arid    = m_item.s_axi_arid;
-              // m_item_beat.s_axi_araddr  = m_item.s_axi_araddr;
-              // m_item_beat.s_axi_arlen   = m_item.s_axi_arlen;
-              // m_item_beat.s_axi_arsize  = m_item.s_axi_arsize;
-              // m_item_beat.s_axi_arburst = m_item.s_axi_arburst;
-              // m_item_beat.s_axi_arlock  = m_item.s_axi_arlock;
-              // m_item_beat.s_axi_arcache = m_item.s_axi_arcache;
-              // m_item_beat.s_axi_arprot  = m_item.s_axi_arprot;
-              // m_item_beat.s_axi_arvalid = m_item.s_axi_arvalid;
-              // m_item_beat.s_axi_arready = m_item.s_axi_arready; 
+              m_item_beat.s_axi_arid    = m_item.s_axi_arid;
+              m_item_beat.s_axi_araddr  = m_item.s_axi_araddr;
+              m_item_beat.s_axi_arlen   = m_item.s_axi_arlen;
+              m_item_beat.s_axi_arsize  = m_item.s_axi_arsize;
+              m_item_beat.s_axi_arburst = m_item.s_axi_arburst;
+              m_item_beat.s_axi_arlock  = m_item.s_axi_arlock;
+              m_item_beat.s_axi_arcache = m_item.s_axi_arcache;
+              m_item_beat.s_axi_arprot  = m_item.s_axi_arprot;
+              m_item_beat.s_axi_arvalid = m_item.s_axi_arvalid;
+              m_item_beat.s_axi_arready = m_item.s_axi_arready; 
               // Read data line
               m_item_beat.s_axi_rid     = axi_vif.s_axi_rid;
               m_item_beat.s_axi_rdata   = axi_vif.s_axi_rdata;
@@ -109,7 +117,7 @@ class axi_monitor extends uvm_monitor;
                 break;  // Exit the loop after the last data beat
               end
             end
-        end*/
+        end
     end
   endtask
 endclass
