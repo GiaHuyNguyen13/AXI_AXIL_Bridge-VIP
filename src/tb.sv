@@ -18,10 +18,10 @@ module tb;
   end
 
   // Reset gen
-  initial begin
-    repeat (1000) @(posedge clk);
-    $finish();
-  end
+  // initial begin
+  //   repeat (1000) @(posedge clk);
+  //   $finish();
+  // end
 
   initial begin
   $dumpfile("waveform.vcd");  // Specify the dump file name

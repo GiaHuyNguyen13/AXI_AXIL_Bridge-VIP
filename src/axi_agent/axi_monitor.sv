@@ -111,8 +111,10 @@ class axi_monitor extends uvm_monitor;
               m_item_beat.s_axi_rresp   = axi_vif.s_axi_rresp;
               m_item_beat.s_axi_rlast   = axi_vif.s_axi_rlast;
               m_item_beat.s_axi_rvalid  = axi_vif.s_axi_rvalid;
-              m_item_beat.s_axi_rready  = axi_vif.s_axi_rready;    
+              m_item_beat.s_axi_rready  = axi_vif.s_axi_rready;
               axi_mon_ap.write(m_item_beat);
+              @(posedge axi_vif.clk)
+              @(posedge axi_vif.clk)
               if (axi_vif.s_axi_rlast) begin
                 break;  // Exit the loop after the last data beat
               end

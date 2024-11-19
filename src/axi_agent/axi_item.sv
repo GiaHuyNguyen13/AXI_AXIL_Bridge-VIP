@@ -122,7 +122,7 @@ class axi_item extends uvm_sequence_item;
 
    constraint c_s_axi_arsize {
       // s_axi_arsize inside {[0:7]};
-      s_axi_arsize == 1;
+      s_axi_arsize == 0;
    }
 
    constraint c_s_axi_arburst {

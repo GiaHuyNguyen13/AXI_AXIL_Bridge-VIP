@@ -4,8 +4,8 @@ class burst_test extends base_test;
     super.new(name, parent);
   endfunction
 
-  bit operation = 0; // 0  for read, 1 for write
-  bit [6:0] test_num = 3;
+  bit operation = 1; // 0  for read, 1 for write
+  bit [31:0] test_num = 100;
   bit [7:0] burst_len = 2; // 0 is 1 beat, 1 is 2 beat, ...
   bit [13:0] axil_num = test_num * (burst_len + 1);
   

@@ -4,7 +4,7 @@ class axil_gen_item_seq extends uvm_sequence;
     super.new(name);
   endfunction
 
-  rand bit [6:0] num;
+  rand bit [31:0] num;
   rand bit op;
   rand bit [7:0] len;
 

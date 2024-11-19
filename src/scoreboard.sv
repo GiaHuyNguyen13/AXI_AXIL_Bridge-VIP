@@ -56,7 +56,6 @@ class scoreboard extends uvm_scoreboard;
         `uvm_info("SCBD", $sformatf("Blen reset here"), UVM_LOW);
         blen = 0;
       end 
-
       // Write transaction
     end else if (axi_item.s_axi_wvalid && axi_item.s_axi_wready) begin
       `uvm_info("SCBD", $sformatf("Process axi write transaction"), UVM_LOW);
@@ -113,6 +112,8 @@ class scoreboard extends uvm_scoreboard;
      // Check phase to compare expected and actual AXI-Lite transactions
  function void check_phase(uvm_phase phase);
     super.check_phase(phase);
+    // for (int h = 0; h < actual_axi_tx_q.size(); h++)
+    //   $display("AXI actual: %0d\n",actual_axi_tx_q[h].s_axi_rdata);
     `uvm_info("SCBD", "Starting check phase for transactions", UVM_LOW);
 
     // axi_item expected_axi_tr;
@@ -213,7 +214,7 @@ class scoreboard extends uvm_scoreboard;
       
     end
 
-    for (int l = 0; l < expected_axi_tx_q.size(); l++) begin
+    for (int l = 0; l < expected_axil_tx_q.size(); l++) begin
       axil_item expected_rd_axil_tr = expected_axil_tx_q[l];
       axil_item actual_rd_axil_tr = actual_axil_tx_q[l];
 
